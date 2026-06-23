@@ -1,3 +1,6 @@
+import Auth from "@/features/auth/page";
+
+
 export default function AuthPage() {
   return (
     <div className="flex min-h-screen items-center justify-center">
