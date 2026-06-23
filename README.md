@@ -1,36 +1,122 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# WishFlow — Умные списки желаний
 
-## Getting Started
+Современное веб-приложение для создания и совместного использования вишлистов.
 
-First, run the development server:
+![WishFlow Preview](https://via.placeholder.com/800x400?text=WishFlow+Preview)
+
+## ✨ О проекте
+
+**WishFlow** помогает легко создавать красивые списки желаний (на день рождения, Новый год, свадьбу, юбилей и т.д.) и делиться ими с друзьями и близкими.
+
+Больше никаких «кидай список в чат» и потерянных подарков. Друзья могут открыть публичную ссылку и отметить, что они планируют подарить — все видят это в реальном времени.
+
+### Основная идея
+
+- Создавай один или несколько вишлистов
+- Добавляй подарки с фото, ссылками и ценой
+- Делись публичной ссылкой
+- Друзья отмечают «Я подарю это»
+- Избегай дублирования подарков
+
+---
+
+## 🚀 Технологический стек
+
+### Основные технологии
+
+- **Next.js 16** (App Router + React 19)
+- **TypeScript**
+- **Tailwind CSS** + **shadcn/ui**
+- **Vercel Postgres** + **Drizzle ORM**
+- **NextAuth.js** (Auth.js v5)
+- **React Hook Form** + **Zod**
+- **TanStack Query** (React Query)
+- **Server Actions** + Server Components
+
+### Дополнительно
+
+- Sonner (toast-уведомления)
+- Partial Prerendering
+- Optimistic Updates
+- Vercel (Deployment)
+
+---
+
+## 🔥 Основные возможности
+
+- ✅ Авторизация через NextAuth
+- ✅ Создание и управление вишлистами
+- ✅ Публичные и приватные списки
+- ✅ Добавление подарков с фото и ссылками
+- ✅ Отметка «Я подарю это» другими пользователями
+- ✅ Адаптивный современный дизайн
+- ✅ Полностью типизированный код (TypeScript)
+- ✅ Server-First подход (максимальная производительность)
+
+---
+
+## Архитектура проекта
+
+Проект построен по **feature-based** структуре:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+src/
+├── app/              # App Router
+├── components/       # UI-компоненты
+├── features/         # Бизнес-логика по фичам
+├── db/               # Drizzle схема и подключение
+├── lib/              # Утилиты, auth, db
+└── types/
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+---
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Как запустить локально
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+# Клонировать репозиторий
+git clone https://github.com/твой-юзернейм/wishflow.git
+cd wishflow
 
-## Learn More
+# Установить зависимости
+npm install
 
-To learn more about Next.js, take a look at the following resources:
+# Настроить переменные окружения
+cp .env.example .env.local
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+# Применить базу данных
+npm run db:push
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+# Запустить проект
+npm run dev
+```
 
-## Deploy on Vercel
+---
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Переменные окружения
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Создай файл `.env.local`:
+
+```env
+NEXTAUTH_SECRET=...
+NEXTAUTH_URL=http://localhost:3000
+
+POSTGRES_URL=postgres://...
+```
+
+---
+
+## Цели проекта
+
+- Демонстрация современного full-stack разработки на стеке 2026 года
+- Показать уверенное владение **Next.js 16 + React 19**
+- Красивый и чистый код
+- Хорошая архитектура и типизация
+
+---
+
+**Статус проекта**: В активной разработке
+
+---
+
+**Автор**: [angelos](https://github.com/yousxlfs)
