@@ -1,7 +1,2 @@
-export default function Auth() {
-    return (
-        <div>
-            <h1>Auth</h1>
-        </div>
-    );
-}
+export { LoginForm } from "@/components/login-form";
+export { SignupForm } from "@/components/signup-form";

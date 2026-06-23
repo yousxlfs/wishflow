@@ -1,76 +1,108 @@
-import { Button } from "@/components/ui/button"
+import Link from "next/link";
+import { cn } from "@/lib/utils";
+import { authRoutes } from "@/lib/auth/routes";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card"
+} from "@/components/ui/card";
 import {
   Field,
   FieldDescription,
   FieldGroup,
   FieldLabel,
-} from "@/components/ui/field"
-import { Input } from "@/components/ui/input"
+  FieldSeparator,
+} from "@/components/ui/field";
+import { Input } from "@/components/ui/input";
 
-export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
+export function SignupForm({
+  className,
+  ...props
+}: React.ComponentProps<typeof Card>) {
   return (
-    <Card {...props}>
+    <Card className={cn(className)} {...props}>
       <CardHeader>
-        <CardTitle>Create an account</CardTitle>
+        <CardTitle>Создать аккаунт</CardTitle>
         <CardDescription>
-          Enter your information below to create your account
+          Заполни форму, чтобы начать собирать списки желаний
         </CardDescription>
       </CardHeader>
       <CardContent>
+        {/* TODO: добавь action / onSubmit и server action registerUser */}
         <form>
           <FieldGroup>
             <Field>
-              <FieldLabel htmlFor="name">Full Name</FieldLabel>
-              <Input id="name" type="text" placeholder="John Doe" required />
+              <FieldLabel htmlFor="name">Имя</FieldLabel>
+              <Input
+                id="name"
+                name="name"
+                type="text"
+                placeholder="Иван"
+                autoComplete="name"
+                required
+              />
             </Field>
             <Field>
               <FieldLabel htmlFor="email">Email</FieldLabel>
               <Input
                 id="email"
+                name="email"
                 type="email"
-                placeholder="m@example.com"
+                placeholder="you@example.com"
+                autoComplete="email"
                 required
               />
               <FieldDescription>
-                We&apos;ll use this to contact you. We will not share your email
-                with anyone else.
+                Используем только для входа и уведомлений.
               </FieldDescription>
             </Field>
             <Field>
-              <FieldLabel htmlFor="password">Password</FieldLabel>
-              <Input id="password" type="password" required />
-              <FieldDescription>
-                Must be at least 8 characters long.
-              </FieldDescription>
+              <FieldLabel htmlFor="password">Пароль</FieldLabel>
+              <Input
+                id="password"
+                name="password"
+                type="password"
+                autoComplete="new-password"
+                minLength={8}
+                required
+              />
+              <FieldDescription>Минимум 8 символов.</FieldDescription>
             </Field>
             <Field>
-              <FieldLabel htmlFor="confirm-password">
-                Confirm Password
-              </FieldLabel>
-              <Input id="confirm-password" type="password" required />
-              <FieldDescription>Please confirm your password.</FieldDescription>
+              <FieldLabel htmlFor="confirmPassword">Подтверждение пароля</FieldLabel>
+              <Input
+                id="confirmPassword"
+                name="confirmPassword"
+                type="password"
+                autoComplete="new-password"
+                minLength={8}
+                required
+              />
             </Field>
-            <FieldGroup>
-              <Field>
-                <Button type="submit">Create Account</Button>
-                <Button variant="outline" type="button">
-                  Sign up with Google
-                </Button>
-                <FieldDescription className="px-6 text-center">
-                  Already have an account? <a href="#">Sign in</a>
-                </FieldDescription>
-              </Field>
-            </FieldGroup>
+            <Field>
+              <Button type="submit" className="w-full">
+                Создать аккаунт
+              </Button>
+            </Field>
+            <FieldSeparator>или</FieldSeparator>
+            <Field>
+              {/* TODO: onClick -> signIn("google") */}
+              <Button variant="outline" type="button" className="w-full">
+                Регистрация через Google
+              </Button>
+              <FieldDescription className="text-center">
+                Уже есть аккаунт?{" "}
+                <Link href={authRoutes.signIn} className="underline-offset-4 hover:underline">
+                  Войти
+                </Link>
+              </FieldDescription>
+            </Field>
           </FieldGroup>
         </form>
       </CardContent>
     </Card>
-  )
+  );
 }

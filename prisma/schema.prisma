@@ -6,12 +6,62 @@ datasource db {
   provider = "postgresql"
 }
 
+// ====================== NEXTAUTH MODELS ======================
+model Account {
+  id                 String  @id @default(cuid())
+  userId             Int
+  type               String
+  provider           String
+  providerAccountId  String
+  refresh_token      String? @db.Text
+  access_token       String? @db.Text
+  expires_at         Int?
+  token_type         String?
+  scope              String?
+  id_token           String? @db.Text
+  session_state      String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@map("accounts")
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       Int
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+  @@map("verification_tokens")
+}
+
+// ====================== ТВОИ МОДЕЛИ ======================
 model User {
-  id        Int        @id @default(autoincrement())
-  name      String?
-  email     String?    @unique
-  image     String?
-  wishlists Wishlist[]
+  id            Int      @id @default(autoincrement())
+  name          String?
+  email         String?  @unique
+  emailVerified DateTime?
+  image         String?
+  password      String?   // для Credentials авторизации
+
+  accounts          Account[]
+  sessions          Session[]
+  wishlists         Wishlist[]
+  reservedItems     WishlistItem[]     @relation("ReservedItems")
+  userReservedItems UserReservedItem[]
+
+  @@map("users")
 }
 
 model Wishlist {
@@ -22,7 +72,42 @@ model Wishlist {
   slug        String   @unique
   isPublic    Boolean  @default(false) @map("is_public")
   createdAt   DateTime @default(now()) @map("created_at")
+
   user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
+  items       WishlistItem[]
+
   @@map("wishlists")
+}
+
+model WishlistItem {
+  id          Int      @id @default(autoincrement())
+  wishlistId  Int      @map("wishlist_id")
+  name        String
+  description String?
+  price       Float?
+  url         String?
+  image       String?
+  isReserved  Boolean  @default(false) @map("is_reserved")
+  reservedBy  Int?     @map("reserved_by")     // userId кто зарезервировал
+  reservedAt  DateTime? @map("reserved_at")
+
+  wishlist          Wishlist           @relation(fields: [wishlistId], references: [id], onDelete: Cascade)
+  reservedUser      User?              @relation("ReservedItems", fields: [reservedBy], references: [id])
+  userReservedItems UserReservedItem[]
+
+  @@map("wishlist_items")
+}
+
+// Отдельная связь для удобства
+model UserReservedItem {
+  id        Int @id @default(autoincrement())
+  userId    Int
+  itemId    Int
+
+  user      User          @relation(fields: [userId], references: [id])
+  item      WishlistItem  @relation(fields: [itemId], references: [id])
+
+  @@unique([userId, itemId])
+  @@map("user_reserved_items")
 }

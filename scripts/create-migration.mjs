@@ -18,9 +18,10 @@ const migrationName = `${timestamp}_${name}`;
 const migrationDir = join("prisma", "migrations", migrationName);
 const migrationFile = join(migrationDir, "migration.sql");
 
+const fromArgs = ["--from-migrations", "prisma/migrations"];
 const sql = execSync(
-  "npx prisma migrate diff --from-migrations prisma/migrations --to-schema prisma/schema.prisma --script",
-  { encoding: "utf8" },
+  `npx prisma migrate diff ${fromArgs.join(" ")} --to-schema prisma/schema.prisma --script`,
+  { encoding: "utf8", stdio: ["ignore", "pipe", "pipe"] },
 ).trim();
 
 if (!sql) {
