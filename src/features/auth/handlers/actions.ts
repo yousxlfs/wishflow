@@ -47,6 +47,6 @@ export async function registerUser(
 }
 
 export async function logoutUser() {
-  const { signOut } = await import("@/lib/auth");
+  const { signOut } = await import("@/lib/auth.session");
   await signOut({ redirectTo: authRoutes.signIn });
 }

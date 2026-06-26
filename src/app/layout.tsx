@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Inter, Playfair_Display } from "next/font/google";
+import { AuthSessionProvider } from "@/components/providers/session-provider";
 import { ThemeProvider } from "@/components/providers/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
 import "./globals.css";
@@ -33,10 +34,12 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <body className="min-h-full flex flex-col">
-        <ThemeProvider>
-          {children}
-          <Toaster richColors closeButton position="top-right" />
-        </ThemeProvider>
+        <AuthSessionProvider>
+          <ThemeProvider>
+            {children}
+            <Toaster richColors closeButton position="top-right" />
+          </ThemeProvider>
+        </AuthSessionProvider>
       </body>
     </html>
   );
