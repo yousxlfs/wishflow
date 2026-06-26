@@ -3,8 +3,8 @@ import Credentials from "next-auth/providers/credentials";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import bcrypt from "bcryptjs";
 import { z } from "zod";
+import { authConfig } from "@/lib/auth.config";
 import { prisma } from "@/lib/db";
-import { appRoutes, authRoutes } from "@/lib/auth/routes";
 
 class InvalidLoginError extends Error {
   code = "invalid_credentials";
@@ -16,8 +16,7 @@ const loginSchema = z.object({
 });
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
-  secret: process.env.AUTH_SECRET,
-  trustHost: true,
+  ...authConfig,
   adapter: PrismaAdapter(prisma),
   providers: [
     Credentials({
@@ -56,32 +55,4 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       },
     }),
   ],
-  session: { strategy: "jwt" },
-  pages: {
-    signIn: authRoutes.signIn,
-  },
-  callbacks: {
-    jwt({ token, user }) {
-      if (user?.id) {
-        token.sub = user.id;
-        token.id = user.id;
-      }
-      return token;
-    },
-    session({ session, token }) {
-      if (token.sub) {
-        session.user.id = token.sub;
-      }
-      return session;
-    },
-    async redirect({ url, baseUrl }) {
-      if (url.startsWith("/")) {
-        return `${baseUrl}${url}`;
-      }
-      if (url.startsWith(baseUrl)) {
-        return url;
-      }
-      return `${baseUrl}${appRoutes.profileEdit}`;
-    },
-  },
 });
