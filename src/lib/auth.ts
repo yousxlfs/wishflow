@@ -1,48 +1,87 @@
-/**
- * NextAuth (Auth.js v5) — заготовка конфигурации.
- *
- * Когда будешь подключать логику:
- * 1. npm install @auth/prisma-adapter bcryptjs
- * 2. npm install -D @types/bcryptjs
- * 3. Раскомментируй провайдеры и adapter ниже
- * 4. Добавь AUTH_SECRET, GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET в .env
- */
 import NextAuth from "next-auth";
+import Credentials from "next-auth/providers/credentials";
+import { PrismaAdapter } from "@auth/prisma-adapter";
+import bcrypt from "bcryptjs";
+import { z } from "zod";
+import { prisma } from "@/lib/db";
+import { appRoutes, authRoutes } from "@/lib/auth/routes";
 
-// import { PrismaAdapter } from "@auth/prisma-adapter";
-// import Credentials from "next-auth/providers/credentials";
-// import Google from "next-auth/providers/google";
-// import bcrypt from "bcryptjs";
-// import { prisma } from "@/lib/prisma";
+class InvalidLoginError extends Error {
+  code = "invalid_credentials";
+}
 
-export const { handlers, auth, signIn, signOut } = NextAuth({
-  // adapter: PrismaAdapter(prisma),
+const loginSchema = z.object({
+  username: z.string().min(3),
+  password: z.string().min(8),
+});
+
+export const { handlers, signIn, signOut, auth } = NextAuth({
+  secret: process.env.AUTH_SECRET,
+  trustHost: true,
+  adapter: PrismaAdapter(prisma),
   providers: [
-    // Google({
-    //   clientId: process.env.GOOGLE_CLIENT_ID,
-    //   clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-    // }),
-    // Credentials({
-    //   credentials: {
-    //     email: { label: "Email", type: "email" },
-    //     password: { label: "Password", type: "password" },
-    //   },
-    //   async authorize(credentials) {
-    //     // TODO: найти пользователя и проверить пароль через bcrypt
-    //     return null;
-    //   },
-    // }),
+    Credentials({
+      credentials: {
+        username: { label: "Username", type: "text" },
+        password: { label: "Password", type: "password" },
+      },
+      async authorize(credentials) {
+        const result = loginSchema.safeParse(credentials);
+        if (!result.success) {
+          throw new InvalidLoginError("Invalid username or password");
+        }
+
+        const user = await prisma.user.findUnique({
+          where: { username: result.data.username },
+        });
+
+        if (!user?.password) {
+          throw new InvalidLoginError("Invalid username or password");
+        }
+
+        const isValid = await bcrypt.compare(
+          result.data.password,
+          user.password,
+        );
+
+        if (!isValid) {
+          throw new InvalidLoginError("Invalid username or password");
+        }
+
+        return {
+          id: user.id.toString(),
+          name: user.name,
+          email: user.email,
+        };
+      },
+    }),
   ],
   session: { strategy: "jwt" },
   pages: {
-    signIn: "/auth/signin",
+    signIn: authRoutes.signIn,
   },
   callbacks: {
+    jwt({ token, user }) {
+      if (user?.id) {
+        token.sub = user.id;
+        token.id = user.id;
+      }
+      return token;
+    },
     session({ session, token }) {
       if (token.sub) {
         session.user.id = token.sub;
       }
       return session;
+    },
+    async redirect({ url, baseUrl }) {
+      if (url.startsWith("/")) {
+        return `${baseUrl}${url}`;
+      }
+      if (url.startsWith(baseUrl)) {
+        return url;
+      }
+      return `${baseUrl}${appRoutes.profileEdit}`;
     },
   },
 });
