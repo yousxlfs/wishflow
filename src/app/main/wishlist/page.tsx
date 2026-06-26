@@ -1,7 +1,6 @@
-export default function WishListPage() {
-  return (
-    <div className="flex min-h-screen items-center justify-center">
-      <h1>Страница списка желаемого</h1>
-    </div>
-  );
+import { redirect } from "next/navigation";
+import { appRoutes } from "@/lib/auth/routes";
+
+export default function LegacyWishlistIndexPage() {
+  redirect(appRoutes.dashboard);
 }

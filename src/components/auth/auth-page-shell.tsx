@@ -1,8 +1,10 @@
 import Link from "next/link";
+import type { ReactNode } from "react";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { cn } from "@/lib/utils";
 
 type AuthPageShellProps = {
-  children: React.ReactNode;
+  children: ReactNode;
   title?: string;
   description?: string;
   className?: string;
@@ -17,20 +19,22 @@ export function AuthPageShell({
   return (
     <div
       className={cn(
-        "flex min-h-screen flex-col items-center justify-center bg-muted/40 px-4 py-10",
+        "relative flex min-h-screen flex-col items-center justify-center px-4 py-10 auth-gradient",
         className,
       )}
     >
-      <div className="mb-8 flex flex-col items-center gap-2 text-center">
-        <Link
-          href="/"
-          className="text-2xl font-semibold tracking-tight hover:opacity-80"
-        >
+      <div className="absolute right-4 top-4">
+        <ThemeToggle />
+      </div>
+
+      <div className="mb-8 flex w-full max-w-[420px] flex-col items-center gap-2 text-center">
+        <Link href="/" className="font-display text-3xl font-semibold tracking-tight">
           {title}
         </Link>
-        <p className="max-w-sm text-sm text-muted-foreground">{description}</p>
+        <p className="text-balance text-sm text-muted-foreground">{description}</p>
       </div>
-      <div className="w-full max-w-md">{children}</div>
+
+      <div className="w-full max-w-[420px]">{children}</div>
     </div>
   );
 }

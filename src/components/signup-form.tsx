@@ -1,5 +1,9 @@
+"use client";
+
 import Link from "next/link";
-import { cn } from "@/lib/utils";
+import { useActionState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { registerUser, type AuthActionState } from "@/features/auth/handlers/actions";
 import { authRoutes } from "@/lib/auth/routes";
 import { Button } from "@/components/ui/button";
 import {
@@ -17,13 +21,21 @@ import {
   FieldSeparator,
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
+import { cn } from "@/lib/utils";
+
+const initialState: AuthActionState = {};
 
 export function SignupForm({
   className,
   ...props
 }: React.ComponentProps<typeof Card>) {
+  const [state, formAction, isPending] = useActionState(registerUser, initialState);
+
   return (
-    <Card className={cn(className)} {...props}>
+    <Card
+      className={cn("border-border/80 bg-surface/90 shadow-xl backdrop-blur-sm", className)}
+      {...props}
+    >
       <CardHeader>
         <CardTitle>Создать аккаунт</CardTitle>
         <CardDescription>
@@ -31,9 +43,33 @@ export function SignupForm({
         </CardDescription>
       </CardHeader>
       <CardContent>
-        {/* TODO: добавь action / onSubmit и server action registerUser */}
-        <form>
+        <form action={formAction}>
           <FieldGroup>
+            <AnimatePresence>
+              {state.error ? (
+                <motion.div
+                  initial={{ opacity: 0, y: -8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -8 }}
+                  className="rounded-xl border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive"
+                >
+                  {state.error}
+                </motion.div>
+              ) : null}
+            </AnimatePresence>
+
+            <Field>
+              <FieldLabel htmlFor="username">Username</FieldLabel>
+              <Input
+                id="username"
+                name="username"
+                type="text"
+                placeholder="ivan_wish"
+                autoComplete="username"
+                required
+              />
+            </Field>
+
             <Field>
               <FieldLabel htmlFor="name">Имя</FieldLabel>
               <Input
@@ -45,6 +81,7 @@ export function SignupForm({
                 required
               />
             </Field>
+
             <Field>
               <FieldLabel htmlFor="email">Email</FieldLabel>
               <Input
@@ -55,10 +92,8 @@ export function SignupForm({
                 autoComplete="email"
                 required
               />
-              <FieldDescription>
-                Используем только для входа и уведомлений.
-              </FieldDescription>
             </Field>
+
             <Field>
               <FieldLabel htmlFor="password">Пароль</FieldLabel>
               <Input
@@ -71,6 +106,7 @@ export function SignupForm({
               />
               <FieldDescription>Минимум 8 символов.</FieldDescription>
             </Field>
+
             <Field>
               <FieldLabel htmlFor="confirmPassword">Подтверждение пароля</FieldLabel>
               <Input
@@ -82,20 +118,25 @@ export function SignupForm({
                 required
               />
             </Field>
+
             <Field>
-              <Button type="submit" className="w-full">
+              <Button type="submit" className="w-full" isLoading={isPending}>
                 Создать аккаунт
               </Button>
             </Field>
+
             <FieldSeparator>или</FieldSeparator>
+
             <Field>
-              {/* TODO: onClick -> signIn("google") */}
-              <Button variant="outline" type="button" className="w-full">
+              <Button variant="outline" type="button" className="w-full" disabled>
                 Регистрация через Google
               </Button>
               <FieldDescription className="text-center">
                 Уже есть аккаунт?{" "}
-                <Link href={authRoutes.signIn} className="underline-offset-4 hover:underline">
+                <Link
+                  href={authRoutes.signIn}
+                  className="text-primary underline-offset-4 hover:underline"
+                >
                   Войти
                 </Link>
               </FieldDescription>

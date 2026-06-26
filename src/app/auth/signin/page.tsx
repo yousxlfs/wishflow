@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { AuthPageShell } from "@/components/auth/auth-page-shell";
+import { PageTransition } from "@/components/layout/page-transition";
 import { LoginForm } from "@/components/login-form";
 
 export const metadata: Metadata = {
@@ -8,11 +9,10 @@ export const metadata: Metadata = {
 
 export default function SignInPage() {
   return (
-    <AuthPageShell
-      title="Wishflow"
-      description="С возвращением! Войди, чтобы управлять списками желаний."
-    >
-      <LoginForm />
+    <AuthPageShell description="С возвращением! Войди, чтобы управлять списками желаний.">
+      <PageTransition>
+        <LoginForm />
+      </PageTransition>
     </AuthPageShell>
   );
 }

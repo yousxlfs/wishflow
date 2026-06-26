@@ -1,44 +1,52 @@
 "use server";
 
+import bcrypt from "bcryptjs";
+import { redirect } from "next/navigation";
+import { prisma } from "@/lib/db";
+import { authRoutes } from "@/lib/auth/routes";
+import { registerSchema } from "@/features/auth/lib/schemas";
+
 export type AuthActionState = {
-  success: boolean;
-  message?: string;
+  success?: boolean;
+  error?: string;
 };
 
-/**
- * TODO: реализуй регистрацию
- * - проверь совпадение password / confirmPassword
- * - захешируй пароль (bcrypt)
- * - создай пользователя через prisma.user.create
- * - опционально: signIn("credentials", ...) после успеха
- */
 export async function registerUser(
   _prevState: AuthActionState,
-  _formData: FormData,
+  formData: FormData,
 ): Promise<AuthActionState> {
-  return {
-    success: false,
-    message: "Регистрация ещё не подключена",
-  };
+  const result = registerSchema.safeParse(Object.fromEntries(formData.entries()));
+
+  if (!result.success) {
+    const firstError = result.error.issues[0]?.message;
+    return { error: firstError ?? "Неверные данные формы" };
+  }
+
+  const { username, password, name, email } = result.data;
+
+  const existing = await prisma.user.findFirst({
+    where: { OR: [{ username }, { email }] },
+  });
+
+  if (existing) {
+    return { error: "Username или email уже заняты" };
+  }
+
+  const hashedPassword = await bcrypt.hash(password, 10);
+
+  await prisma.user.create({
+    data: {
+      username,
+      password: hashedPassword,
+      name,
+      email,
+    },
+  });
+
+  redirect(authRoutes.signIn);
 }
 
-/**
- * TODO: реализуй вход через credentials
- * - обычно вызывается signIn("credentials", { email, password, redirectTo })
- */
-export async function loginWithCredentials(
-  _formData: FormData,
-): Promise<AuthActionState> {
-  return {
-    success: false,
-    message: "Вход ещё не подключён",
-  };
-}
-
-/**
- * TODO: реализуй выход
- * - await signOut({ redirectTo: "/auth/signin" })
- */
-export async function logoutUser(): Promise<void> {
-  // placeholder
+export async function logoutUser() {
+  const { signOut } = await import("@/lib/auth");
+  await signOut({ redirectTo: authRoutes.signIn });
 }

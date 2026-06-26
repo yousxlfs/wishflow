@@ -1,7 +1,14 @@
+import { PageTransition } from "@/components/layout/page-transition";
+
 export default function ProfilePage() {
   return (
-    <div className="flex min-h-screen items-center justify-center">
-      <h1>Страница профиля</h1>
-    </div>
+    <PageTransition>
+      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6">
+        <h1 className="font-display text-3xl font-semibold">Профиль</h1>
+        <p className="mt-2 text-muted-foreground">
+          Публичная страница профиля появится здесь позже.
+        </p>
+      </div>
+    </PageTransition>
   );
 }
