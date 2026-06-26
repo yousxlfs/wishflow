@@ -1,13 +1,13 @@
 import { z } from "zod";
 
-/** TODO: используй в server actions и react-hook-form */
 export const loginSchema = z.object({
-  email: z.email("Введите корректный email"),
-  password: z.string().min(1, "Введите пароль"),
+  username: z.string().min(3, "Минимум 3 символа"),
+  password: z.string().min(8, "Минимум 8 символов"),
 });
 
 export const registerSchema = z
   .object({
+    username: z.string().min(3, "Минимум 3 символа"),
     name: z.string().min(2, "Имя слишком короткое"),
     email: z.email("Введите корректный email"),
     password: z.string().min(8, "Минимум 8 символов"),

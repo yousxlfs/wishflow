@@ -6,6 +6,7 @@ export const authRoutes = {
 export const appRoutes = {
   home: "/",
   dashboard: "/main/dasboard",
+  profileEdit: "/main/profile/edit",
 } as const;
 
 export const protectedRoutes = ["/main"] as const;
