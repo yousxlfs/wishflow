@@ -2,14 +2,19 @@
 
 import Link from "next/link";
 import { Menu, X } from "lucide-react";
-import { signOut, useSession } from "next-auth/react";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
-import { appRoutes, authRoutes } from "@/lib/auth/routes";
+import { appRoutes } from "@/lib/auth/routes";
+import { logoutUser } from "@/features/auth/handlers/actions";
 import { cn } from "@/lib/utils";
+
+type NavbarProps = {
+  userName?: string;
+  userImage?: string | null;
+};
 
 const navLinks = [
   { href: appRoutes.dashboard, label: "Вишлисты" },
@@ -17,22 +22,14 @@ const navLinks = [
   { href: appRoutes.profileEdit, label: "Профиль" },
 ];
 
-export function Navbar() {
-  const { data: session } = useSession();
+export function Navbar({ userName = "Пользователь", userImage }: NavbarProps) {
   const [open, setOpen] = useState(false);
-
-  const userName = session?.user?.name ?? "Пользователь";
-  const userImage = session?.user?.image;
   const initials = userName
     .split(" ")
     .map((part) => part[0])
     .join("")
     .slice(0, 2)
     .toUpperCase();
-
-  function handleSignOut() {
-    void signOut({ callbackUrl: authRoutes.signIn });
-  }
 
   return (
     <header className="sticky top-0 z-50 border-b border-border bg-background/80 backdrop-blur-xl">
@@ -64,9 +61,11 @@ export function Navbar() {
             </Avatar>
             <span className="max-w-28 truncate text-sm">{userName}</span>
           </div>
-          <Button variant="ghost" size="sm" type="button" onClick={handleSignOut}>
-            Выйти
-          </Button>
+          <form action={logoutUser}>
+            <Button variant="ghost" size="sm" type="submit">
+              Выйти
+            </Button>
+          </form>
         </div>
 
         <div className="flex items-center gap-2 md:hidden">
@@ -103,11 +102,11 @@ export function Navbar() {
                   {link.label}
                 </Link>
               ))}
-              <div className="pt-2">
-                <Button variant="outline" className="w-full" type="button" onClick={handleSignOut}>
+              <form action={logoutUser} className="pt-2">
+                <Button variant="outline" className="w-full" type="submit">
                   Выйти
                 </Button>
-              </div>
+              </form>
             </div>
           </motion.div>
         ) : null}
